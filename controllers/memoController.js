@@ -41,6 +41,48 @@ module.exports = {
       })
     })
   },
+  checklist: function(req, res, next){
+    db.Memo.update({
+      completed: true
+    }, {
+      where: {
+        id: req.params.id
+      }
+    }).then((result) => {
+      if (!result) {
+        res.json({
+          success: false,
+          msg: 'fail when trying to update the data'
+        })
+      }
+
+      res.json({
+        success: true,
+        msg: 'Data updated.'
+      })
+    })
+  },
+  uncheck: function(req, res, next){
+    db.Memo.update({
+      completed: false
+    }, {
+      where: {
+        id: req.params.id
+      }
+    }).then((result) => {
+      if (!result) {
+        res.json({
+          success: false,
+          msg: 'fail when trying to update the data'
+        })
+      }
+
+      res.json({
+        success: true,
+        msg: 'Data updated.'
+      })
+    })
+  },
   destroy: function(req, res, next){
     db.Memo.destroy({
       where: {

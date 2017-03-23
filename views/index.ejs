@@ -3,54 +3,76 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Dynamic Elements and Events</title>
+    <title>CRUD Todos</title>
     <script src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
 
     <div id="app">
         <p>Add todo
-            <input v-model="newTodo" placeholder="Tambah todo">
-              <button v-on:click="addTodo">Add Todo</button>
+            <input v-model="newTodo.title" placeholder="title">
+            <input v-model="newTodo.content" placeholder="Content">
+            <button v-on:click="addTodo">Add Todo</button>
         </p>
         <ul>
-            <li v-for="todo in todos">{{ todo.title }}
-              <input type="checkbox" id="checkbox" v-model="todo.completed">
-              <button v-on:click="deleteTodo(todo.title)">Delete Todo</button>
+            <li v-for="todo in todos">{{ todo.title }} | {{ todo.content }}
+                <input type="checkbox" id="checkbox" v-model="todo.completed" @click="checklist(todo)">
+                <button v-on:click="deleteTodo(todo.id)">Delete Todo</button>
             </li>
         </ul>
     </div>
     <script>
+    var host = 'http://localhost:3000'
         new Vue({
             el: '#app',
             data: {
                 message: 'Hello Vue.js!',
-                todos: [{
-                        title: 'Kerjakan ini',
-                        completed: false,
-                    },
-                    {
-                        title: 'Kerjakan itu',
-                        completed: true,
-                    }
-                ],
-                newTodo: ''
+                todos: [],
+                newTodo: {}
+            },
+            created() {
+                this.getTodos()
             },
             methods: {
-              addTodo(){
-                this.todos.push({
-                  title: this.newTodo,
-                  completed: false
-                })
-                this.newTodo = ''
-              },
-              deleteTodo(todo){
-                this.todos = _.remove(this.todos, function(n) {
-                  return n.title != todo;
-                });
-              }
+                getTodos() {
+                  var self = this
+                    axios.get(host + '/memos')
+                        .then(function(response) {
+                          self.todos = response.data
+                            console.log(response.data);
+                            console.log(self.todos[0].title);
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
+                },
+                checklist(todo){
+                  var self = this
+                  if (!todo.completed) {
+                    axios.get(host + '/memos/checklist/' + todo.id).then((response) => {
+                    })
+                  } else {
+                    axios.get(host + '/memos/uncheck/' + todo.id).then((response) => {
+                    })
+                  }
+                  self.getTodos()
+                },
+                addTodo() {
+                  var self = this
+                    axios.post(host + '/memos', self.newTodo).then((response) => {
+                      self.getTodos()
+                    })
+                    this.newTodo = ''
+                },
+                deleteTodo(id) {
+                  var self = this
+                  axios.delete(host + '/memos/' + id).then((response) => {
+                    self.getTodos()
+                  })
+                }
             }
         })
     </script>
