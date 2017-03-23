@@ -1,11 +1,59 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+
+<head>
+    <meta charset="utf-8">
+    <title>Dynamic Elements and Events</title>
+    <script src="https://cdn.jsdelivr.net/lodash/4.17.4/lodash.min.js"></script>
+</head>
+
+<body>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+
+    <div id="app">
+        <p>Add todo
+            <input v-model="newTodo" placeholder="Tambah todo">
+              <button v-on:click="addTodo">Add Todo</button>
+        </p>
+        <ul>
+            <li v-for="todo in todos">{{ todo.title }}
+              <input type="checkbox" id="checkbox" v-model="todo.completed">
+              <button v-on:click="deleteTodo(todo.title)">Delete Todo</button>
+            </li>
+        </ul>
+    </div>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                message: 'Hello Vue.js!',
+                todos: [{
+                        title: 'Kerjakan ini',
+                        completed: false,
+                    },
+                    {
+                        title: 'Kerjakan itu',
+                        completed: true,
+                    }
+                ],
+                newTodo: ''
+            },
+            methods: {
+              addTodo(){
+                this.todos.push({
+                  title: this.newTodo,
+                  completed: false
+                })
+                this.newTodo = ''
+              },
+              deleteTodo(todo){
+                this.todos = _.remove(this.todos, function(n) {
+                  return n.title != todo;
+                });
+              }
+            }
+        })
+    </script>
+</body>
+
 </html>
